@@ -7,6 +7,9 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { ButtonGroup, IconButton } from "@mui/material";
 import { Close } from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModel } from "../store/productSlice";
+import { RootState } from "../store";
 
 const style = {
   position: "absolute" as "absolute",
@@ -21,33 +24,29 @@ const style = {
 };
 
 interface DeleteModalProps {
-  openModal: boolean;
-  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
   handleDelete: () => void;
 }
 
-const DeleteModal: React.FC<DeleteModalProps> = ({ openModal, setOpenModal, handleDelete }) => {
-  const handleClose = () => {
-    setOpenModal(false);
-  };
-
+const DeleteModal: React.FC<DeleteModalProps> = (props: DeleteModalProps) => {
+  const isModelOpen = useSelector((state: RootState) => state.productReducer.isModelOpen);
+  const dispatch = useDispatch();
   return (
     <div>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
-        open={openModal}
-        onClose={handleClose}
+        open={isModelOpen}
+        onClose={() => dispatch(closeModel())}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
         }}
       >
-        <Fade in={openModal}>
+        <Fade in={isModelOpen}>
           <Box sx={style}>
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-              <IconButton onClick={handleClose}>
+              <IconButton onClick={() => dispatch(closeModel())}>
                 <Close />
               </IconButton>
             </Box>
@@ -63,8 +62,8 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ openModal, setOpenModal, hand
                 Are you sure you want to delete this product from the list?
               </Typography>
               <Box sx={{ display: "flex", justifyContent: "space-around" }}>
-                <Button onClick={handleDelete}>Yes</Button>
-                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={props.handleDelete}>Yes</Button>
+                <Button onClick={() => dispatch(closeModel())}>Cancel</Button>
               </Box>
             </Box>
           </Box>

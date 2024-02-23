@@ -11,11 +11,12 @@ const ProductDetailsPage = () => {
   const products = useSelector((state: RootState) => state.productReducer);
 
   useEffect(() => {
-    if (id) {
-      const p = products.find((el: any) => el.id == id);
+    if (typeof id === "string" && id != "") {
+      const p = products.products.find((el: any) => el.id == id);
       setProduct(p);
     }
   }, [id]);
+
   if (!product) {
     return <Box>No Detail found</Box>;
   }
@@ -24,7 +25,7 @@ const ProductDetailsPage = () => {
     <Container maxWidth={false} sx={{ display: "flex", alignItems: "center", flexDirection: "row", mt: "50px" }}>
       <Box sx={{ width: "50%", display: "flex", justifyContent: "center", alignItems: "center" }}>
         <ImageList sx={{ width: 500, height: 450 }} variant="woven" cols={3} gap={8}>
-          {product.images.map((item) => (
+          {product?.images.map((item) => (
             <ImageListItem key={item}>
               <img
                 srcSet={`${item}?w=161&fit=crop&auto=format&dpr=2 2x`}

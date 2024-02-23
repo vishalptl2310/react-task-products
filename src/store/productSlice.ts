@@ -2,50 +2,54 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getProducts, getProductsByQuery } from '../api/productApi';
 import { Product } from '../types/productTypes';
 
-const initialState: Array<Product> = []
+export interface IProductState {
+    isModelOpen: boolean,
+    products: Array<Product>,
 
+}
+const initialState: IProductState = {
+    isModelOpen: false,
+    products: []
+}
 const productSlice = createSlice({
     name: 'products',
     initialState,
     reducers: {
-        // Define reducers if needed
+        openModel(state) {
+            state.isModelOpen = true
+        },
+        closeModel(state) {
+            state.isModelOpen = false
+        }
     },
     extraReducers: (builder) => {
         builder
             .addCase(fetchProductsData.fulfilled, (state, actions) => {
-                state.length = 0
-                state.push(...actions.payload.products)
+                state.products = actions.payload.products
             })
-            .addCase(fetchProductsByQuery.fulfilled, (state, actions) => {
-                state.length = 0
-                state.push(...actions.payload.products)
+            .addCase(fetchProductsData.pending, (state, actions) => {
+                //if you want to implement loader
+            })
+            .addCase(fetchProductsData.rejected, (state, actions) => {
+                state.products = []
             })
     },
 });
 
 export const fetchProductsData = createAsyncThunk(
     'products/fetchProductsData',
-    async () => {
+    async (searchText: String = "") => {
         try {
-            const response = (await getProducts()).data;
-            return response;
+            if (searchText) {
+                return (await getProductsByQuery(searchText)).data;
+            } else {
+                return (await getProducts()).data;
+            }
         } catch (error) {
             console.error('Error fetching products data:', error);
         }
     },
 );
 
-export const fetchProductsByQuery = createAsyncThunk(
-    'QueryProduct',
-    async (searchText: String) => {
-        try {
-            const response = (await getProductsByQuery(searchText)).data;
-            return response;
-        } catch (error) {
-            console.error('Error fetching products data:', error);
-        }
-    },
-);
-
-// export const {} = UserSlice.actions;
+export const { openModel, closeModel } = productSlice.actions;
 export default productSlice.reducer;

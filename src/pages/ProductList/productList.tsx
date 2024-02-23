@@ -6,33 +6,28 @@ import { useDispatch, useSelector } from "react-redux";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useEffect, useState } from "react";
 import DeleteModal from "../../component/deleteModel";
-import { fetchProductsByQuery, fetchProductsData } from "../../store/productSlice";
+import { closeModel, fetchProductsData, openModel } from "../../store/productSlice";
 import { useNavigate } from "react-router-dom";
 import { Product } from "../../types/productTypes";
 
 export default function ProductList() {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-  const products = useSelector((state: RootState) => state.productReducer);
+  const products = useSelector((state: RootState) => state.productReducer.products);
   const [dataToDelete, setDataToDelete] = useState<Product | null>(null);
-  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
   const [searchProduct, setSearchProduct] = useState<string>("");
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    dispatch(fetchProductsData());
+    dispatch(fetchProductsData(""));
   }, []);
 
   const handleDelete = () => {
-    setOpenDeleteModal(false);
+    dispatch(closeModel());
     console.log(dataToDelete);
   };
-  const fetchData = (searchText: string) => {
-    if (searchText) {
-      dispatch(fetchProductsByQuery(searchText));
-    } else {
-      dispatch(fetchProductsData());
-    }
+  const fetchData = (searchText: string = "") => {
+    dispatch(fetchProductsData(searchText));
   };
   const handleSearchProduct = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -91,7 +86,7 @@ export default function ProductList() {
           <Tooltip
             title={"Delete"}
             onClick={() => {
-              setOpenDeleteModal(true);
+              dispatch(openModel());
               setDataToDelete(params.row);
             }}
           >
@@ -106,7 +101,7 @@ export default function ProductList() {
   ];
   return (
     <>
-      <DeleteModal openModal={openDeleteModal} setOpenModal={setOpenDeleteModal} handleDelete={handleDelete} />
+      <DeleteModal handleDelete={handleDelete} />
       <Box sx={{ height: "calc(100vh - 60px)", width: "100vw", margin: "auto", maxWidth: "1040px" }}>
         <Box display={"flex"} sx={{ justifyContent: "space-between" }}>
           <Typography
