@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { RootState } from "../store";
-import { Product } from "../types/productTypes";
+import { Product } from "../models/productTypes";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();

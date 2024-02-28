@@ -1,15 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getProducts, getProductsByQuery } from '../api/productApi';
-import { Product } from '../types/productTypes';
+import { Product } from '../models/productTypes';
+import { IProductState } from '../models/productSliceType';
 
-export interface IProductState {
-    isModelOpen: boolean,
-    products: Array<Product>,
-
-}
 const initialState: IProductState = {
     isModelOpen: false,
-    products: []
+    products: [],
+    dataToDelete: null
 }
 const productSlice = createSlice({
     name: 'products',
@@ -20,6 +17,9 @@ const productSlice = createSlice({
         },
         closeModel(state) {
             state.isModelOpen = false
+        },
+        setDataToDelete(state, actions) {
+            state.dataToDelete = actions.payload
         }
     },
     extraReducers: (builder) => {
@@ -51,5 +51,5 @@ export const fetchProductsData = createAsyncThunk(
     },
 );
 
-export const { openModel, closeModel } = productSlice.actions;
+export const { openModel, closeModel, setDataToDelete } = productSlice.actions;
 export default productSlice.reducer;

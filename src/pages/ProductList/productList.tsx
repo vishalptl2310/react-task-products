@@ -6,42 +6,36 @@ import { useDispatch, useSelector } from "react-redux";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useEffect, useState } from "react";
 import DeleteModal from "../../component/deleteModel";
-import { closeModel, fetchProductsData, openModel } from "../../store/productSlice";
+import { closeModel, fetchProductsData, openModel, setDataToDelete } from "../../store/productSlice";
 import { useNavigate } from "react-router-dom";
-import { Product } from "../../types/productTypes";
 
 export default function ProductList() {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const products = useSelector((state: RootState) => state.productReducer.products);
-  const [dataToDelete, setDataToDelete] = useState<Product | null>(null);
   const [searchProduct, setSearchProduct] = useState<string>("");
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     dispatch(fetchProductsData(""));
   }, []);
 
-  const handleDelete = () => {
-    dispatch(closeModel());
-    console.log(dataToDelete);
-  };
   const fetchData = (searchText: string = "") => {
     dispatch(fetchProductsData(searchText));
   };
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      fetchData(searchProduct);
+    }, 2000);
+
+    return () => {
+      clearTimeout(t);
+    };
+  }, [searchProduct]);
+
   const handleSearchProduct = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setSearchProduct(value);
-
-    //Debouncing logic
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      setTimeoutId(null);
-    }
-    const t = setTimeout(() => {
-      fetchData(value);
-    }, 1000);
-    setTimeoutId(t);
   };
 
   const columns: GridColDef[] = [
@@ -87,7 +81,7 @@ export default function ProductList() {
             title={"Delete"}
             onClick={() => {
               dispatch(openModel());
-              setDataToDelete(params.row);
+              dispatch(setDataToDelete(params.row));
             }}
           >
             <IconButton sx={{ borderRadius: "9px" }}>
@@ -101,7 +95,7 @@ export default function ProductList() {
   ];
   return (
     <>
-      <DeleteModal handleDelete={handleDelete} />
+      <DeleteModal />
       <Box sx={{ height: "calc(100vh - 60px)", width: "100vw", margin: "auto", maxWidth: "1040px" }}>
         <Box display={"flex"} sx={{ justifyContent: "space-between" }}>
           <Typography

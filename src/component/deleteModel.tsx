@@ -23,12 +23,9 @@ const style = {
   p: 4,
 };
 
-interface DeleteModalProps {
-  handleDelete: () => void;
-}
-
-const DeleteModal: React.FC<DeleteModalProps> = (props: DeleteModalProps) => {
+const DeleteModal = () => {
   const isModelOpen = useSelector((state: RootState) => state.productReducer.isModelOpen);
+  const dataToDelete = useSelector((state: RootState) => state.productReducer.dataToDelete);
   const dispatch = useDispatch();
   return (
     <div>
@@ -62,7 +59,13 @@ const DeleteModal: React.FC<DeleteModalProps> = (props: DeleteModalProps) => {
                 Are you sure you want to delete this product from the list?
               </Typography>
               <Box sx={{ display: "flex", justifyContent: "space-around" }}>
-                <Button onClick={props.handleDelete}>Yes</Button>
+                <Button
+                  onClick={() => {
+                    console.log(dataToDelete);
+                  }}
+                >
+                  Yes
+                </Button>
                 <Button onClick={() => dispatch(closeModel())}>Cancel</Button>
               </Box>
             </Box>
